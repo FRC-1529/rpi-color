@@ -17,6 +17,7 @@ repositories {
 
 dependencies {
     compile 'com.google.code.gson:gson:2.8.5'
+    compile 'com.pi4j:pi4j-core:1.1'
 
     compile name: 'wpiutil'
     compile name: 'ntcore'

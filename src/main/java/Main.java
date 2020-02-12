@@ -95,6 +95,8 @@ public final class Main {
   public static List<SwitchedCameraConfig> switchedCameraConfigs = new ArrayList<>();
   public static List<VideoSource> cameras = new ArrayList<>();
 
+  public static ColorSensor sensor;
+
   private Main() {
   }
 
@@ -294,7 +296,7 @@ public final class Main {
   /**
    * Main.
    */
-  public static void main(String... args) {
+  public static void main(String... args) throws Exception {
     if (args.length > 0) {
       configFile = args[0];
     }
@@ -305,6 +307,7 @@ public final class Main {
     }
 
     // start NetworkTables
+    sensor = new ColorSensor();
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
     if (server) {
       System.out.println("Setting up NetworkTables server");
@@ -328,6 +331,13 @@ public final class Main {
     if (cameras.size() >= 1) {
       VisionThread visionThread = new VisionThread(cameras.get(0),
               new MyPipeline(), pipeline -> {
+                try {
+                  System.out.println("READ THE COLORS");
+                  int[] colors = sensor.readColors();
+                  System.out.println("Clear: "+colors[0]+" Red: "+colors[1]+" Green: "+colors[2]+" Blue: "+colors[3]);
+                } catch (Exception ex) {
+                  System.out.println(ex);
+                }
         // do something with pipeline results
       });
       /* something like this for GRIP:
