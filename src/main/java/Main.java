@@ -24,6 +24,8 @@ import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.vision.VisionPipeline;
 import edu.wpi.first.vision.VisionThread;
 
@@ -96,6 +98,7 @@ public final class Main {
   public static List<VideoSource> cameras = new ArrayList<>();
 
   public static ColorSensor sensor;
+  public static NetworkTable ColorNetwork;
 
   private Main() {
   }
@@ -309,6 +312,7 @@ public final class Main {
     // start NetworkTables
     sensor = new ColorSensor();
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
+    ColorNetwork = ntinst.getTable("ColorSenor");
     if (server) {
       System.out.println("Setting up NetworkTables server");
       ntinst.startServer();
@@ -332,9 +336,21 @@ public final class Main {
       VisionThread visionThread = new VisionThread(cameras.get(0),
               new MyPipeline(), pipeline -> {
                 try {
-                  System.out.println("READ THE COLORS");
                   int[] colors = sensor.readColors();
-                  System.out.println("Clear: "+colors[0]+" Red: "+colors[1]+" Green: "+colors[2]+" Blue: "+colors[3]);
+                  NetworkTableEntry colorEntry = ColorNetwork.getEntry("sensed_color");
+                  if ((colors[1] > colors[2]) && (colors[1] > colors[3])) {
+                    //Its probably red
+                    colorEntry.setString("Red");
+                  } else if ((colors[2] > colors[1]) && (colors[2] > colors[3])) {
+                    //Its probably green
+                    colorEntry.setString("Green");
+                  } else if ((colors[3] > colors[2]) && (colors[3] > colors[1])) {
+                    //Its probably Blue
+                    colorEntry.setString("Blue");
+                  } else if ((colors[1] > colors[3]) && (colors[2] > colors[3])) {
+                    //Its probably Yellow
+                    colorEntry.setString("Yellow");
+                  }
                 } catch (Exception ex) {
                   System.out.println(ex);
                 }
