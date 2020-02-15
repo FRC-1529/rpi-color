@@ -312,7 +312,6 @@ public final class Main {
     // start NetworkTables
     sensor = new ColorSensor();
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
-    ColorNetwork = ntinst.getTable("ColorSenor");
     if (server) {
       System.out.println("Setting up NetworkTables server");
       ntinst.startServer();
@@ -320,6 +319,8 @@ public final class Main {
       System.out.println("Setting up NetworkTables client for team " + team);
       ntinst.startClientTeam(team);
     }
+
+    ColorNetwork = ntinst.getTable("ColorSenor");
 
     // start cameras
     for (CameraConfig config : cameraConfigs) {
